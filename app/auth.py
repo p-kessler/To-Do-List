@@ -26,14 +26,13 @@ def login():
 
         if user:
             if check_password_hash(user.password, password):
-                flash("Logged in successfully", category="success")
                 login_user(user, remember=True)
                 return redirect(url_for("views.home"))
             else:
                 flash("Incorrect password", category="error")
         else:
             flash("No account with this email address", category="error")
-    return render_template("login.html")
+    return render_template("login.html", user=current_user)
 
 @auth.route("/logout")
 @login_required
@@ -101,4 +100,4 @@ def register():
                 
 
             
-    return render_template("register.html")
+    return render_template("register.html", user=current_user)
