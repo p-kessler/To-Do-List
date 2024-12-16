@@ -13,12 +13,14 @@
 
     <!-- Fix this issues vs keeping button outside of <li> -->
     <li  data-task_id="{{ task.id }}">{{ task.task }}
-        <button class="complete">
-            <span aria-hidden="true">&#x2713;</span>
-        </button>
-        <button class="delete close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <div class="buttons">
+            <button class="complete">
+                <span aria-hidden="true">&#x2713;</span>
+            </button>
+            <button class="delete close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     </li>
     {% endif %}
     {% endfor %}
@@ -40,11 +42,14 @@
 <ul id="completed-tasks">
     {% for task in user.tasks %}
     {% if task.status == "complete" %}
-        <li  data-task_id="{{ task.id }}">{{ task.task }}
-            <button class="delete">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <li data-task_id="{{ task.id }}">{{ task.task }}
+            <div class="buttons">
+                <button class="delete">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         </li>
+        
     {% endif %}
     {% endfor %}
 </ul>
@@ -52,7 +57,9 @@
 <script> 
     document.querySelectorAll('.delete').forEach(button => {
         button.addEventListener('click', function() {
-            const taskId = this.parentElement.getAttribute('data-task_id');
+            console.log(this.parentElement.parentElement);
+            const taskId = this.parentElement.parentElement.getAttribute('data-task_id');
+            console.log("Task ID:", taskId);
             fetch('/delete-task', {
                 method: 'DELETE',
                 body: JSON.stringify({ id: taskId }),
@@ -62,7 +69,7 @@
             .then(data => {
                 console.log(data);
                 if (data.success) {
-                    this.parentElement.remove();
+                    this.parentElement.parentElement.remove();
                 }
             });
         });
@@ -72,7 +79,7 @@
 <script>
     document.querySelectorAll('.complete').forEach(button => {
         button.addEventListener('click', function() {
-            const taskId = this.parentElement.getAttribute('data-task_id');
+            const taskId = this.parentElement.parentElement.getAttribute('data-task_id');
             fetch('/mark-complete', {
                 method: 'PUT',
                 body: JSON.stringify({ id: taskId }),
@@ -83,7 +90,7 @@
                 if (data.success) {
                     // this.parentElement.classList.add('completed');
                     const completedSection = document.querySelector('#completed-tasks');
-                    completedSection.appendChild(this.parentElement);
+                    completedSection.appendChild(this.parentElement.parentElement);
                     // this.style.display = 'none'; // Hide the button
                     this.remove();
                 }
