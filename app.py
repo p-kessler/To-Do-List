@@ -155,6 +155,9 @@ def home():
                 new_task = Tasks(task=task, user_id=current_user.id)
                 db.session.add(new_task)
                 db.session.commit()
+
+                # Redirect so when page is refreshed it doesn't duplicate task
+                return redirect(url_for("home"))
             except SQLAlchemyError as e:
                 db.session.rollback()
                 flash(f"Error adding task: {str(e)}", category="error")

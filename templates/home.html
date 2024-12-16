@@ -7,21 +7,19 @@
 <h1>Your To-Dos</h1>
 <br>
 
-<ul class="list-group list-group-flush">
+<ul>
     {% for task in user.tasks %}
     {% if task.status == "incomplete" %}
 
     <!-- Fix this issues vs keeping button outside of <li> -->
-    <div class="container d-flex">
-        <li class="list-group-item task" data-task_id="{{ task.id }}">{{ task.task }}
-            <button class="complete">
-                <span aria-hidden="true">&#x2713;</span>
-            </button>
-            <button class="delete">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </li>
-    </div>
+    <li  data-task_id="{{ task.id }}">{{ task.task }}
+        <button class="complete">
+            <span aria-hidden="true">&#x2713;</span>
+        </button>
+        <button class="delete close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </li>
     {% endif %}
     {% endfor %}
 </ul>
@@ -39,16 +37,14 @@
 
 <br>
 <h3>Completed</h3>
-<ul class="list-group list-group-flush" id="completed-tasks">
+<ul id="completed-tasks">
     {% for task in user.tasks %}
     {% if task.status == "complete" %}
-    <div class="container d-flex">
-        <li class="list-group-item task" data-task_id="{{ task.id }}">{{ task.task }}
+        <li  data-task_id="{{ task.id }}">{{ task.task }}
             <button class="delete">
                 <span aria-hidden="true">&times;</span>
             </button>
         </li>
-    </div>
     {% endif %}
     {% endfor %}
 </ul>
@@ -112,3 +108,26 @@
             <span aria-hidden="true">&times;</span>
         </button>
     </li> -->
+
+
+
+
+<!-- 
+    <ul class="list-group list-group-flush">
+        {% for task in user.tasks %}
+        {% if task.status == "incomplete" %} -->
+    
+        <!-- Fix this issues vs keeping button outside of <li> -->
+        <!-- <div class="container d-flex">
+            <li class="list-group-item task" data-task_id="{{ task.id }}">{{ task.task }}
+                <button class="complete">
+                    <span aria-hidden="true">&#x2713;</span>
+                </button>
+                <button class="delete">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </li>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </ul> -->
