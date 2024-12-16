@@ -2,12 +2,13 @@ from flask_login import LoginManager, login_required
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
 from models import db, Users, Tasks
 import secrets
 import re
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
+import json
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = secrets.token_hex(16)
@@ -145,8 +146,21 @@ def login():
 @login_required
 def home():
     if request.method == "POST":
-        # do something
-        pass
+        task = request.form.get("task")
+        
+        if len(task) < 1:
+            flash("Task is too short!", category="error")
+        else:
+            try:
+                new_task = Tasks(task=task, user_id=current_user.id)
+                db.session.add(new_task)
+                db.session.commit()
+            except SQLAlchemyError as e:
+                db.session.rollback()
+                flash(f"Error adding task: {str(e)}", category="error")
+                return render_template("home.html", task=task)
+
+
     
     return render_template("home.html")
 
@@ -159,9 +173,48 @@ def account():
 def inject_user():
     return dict(user=current_user)
 
+@app.route("/delete-task", methods=["DELETE"])
+def delete_task():
+    data = request.get_json()
+    task_id = data['id']
+    task = Tasks.query.get(task_id)
+    if task:
+        db.session.delete(task)
+        db.session.commit()
+
+    return jsonify({'success': True})
+
+@app.route("/mark-complete", methods=["PUT"])
+def mark_complete():
+    data = request.get_json()
+    task_id = data['id']
+    task = Tasks.query.get(task_id)
+
+    if task:
+        task.status = "complete"
+        db.session.commit()
+    
+    return jsonify({'success': True})
+
+
 if __name__ == "__main__":
     # Create database
     with app.app_context():
         db.create_all()
     app.run(debug=True)
 
+
+
+
+
+
+
+    # task = json.loads(request.data)
+    # task_id = task["task_id"]
+    # task = Tasks.query.get(task_id)
+
+    # if task:
+    #     if task.user_id == current_user.id:
+    #         db.session.delete(task)
+    #         db.session.commit()
+    #         return  jsonify({})
