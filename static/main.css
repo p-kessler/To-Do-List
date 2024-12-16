@@ -2,25 +2,6 @@
     max-width: 300px;
 }
 
-/* .tasks {
-    width: 200px;
-    display: inline-block;
-} */
-
-/* .list-group-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-} */
-
-
-li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.buttons {
-    display: flex;
-    gap: 10px; /* Adjust the gap between buttons as needed */
+.add-task {
+    padding-left: 10px;;
 }

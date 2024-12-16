@@ -7,17 +7,16 @@
 <h1>Your To-Dos</h1>
 <br>
 
-<ul>
+<ul class="list-group">
     {% for task in user.tasks %}
     {% if task.status == "incomplete" %}
-
-    <!-- Fix this issues vs keeping button outside of <li> -->
-    <li  data-task_id="{{ task.id }}">{{ task.task }}
+    <li class="list-group-item d-flex justify-content-between align-items-center" data-task_id="{{ task.id }}">
+        {{ task.task }}
         <div class="buttons">
-            <button class="complete">
+            <button class="complete btn btn-success">
                 <span aria-hidden="true">&#x2713;</span>
             </button>
-            <button class="delete close">
+            <button class="delete btn btn-danger">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
@@ -27,29 +26,52 @@
 </ul>
 
 
+
+
+<!-- <ul class="list-group">
+    {% for task in user.tasks %}
+    {% if task.status == "incomplete" %}
+    <li class="list-group-item d-flex justify-content-between align-items-center" data-task_id="{{ task.id }}">
+        {{ task.task }}
+        <div class="buttons">
+            <button class="complete btn btn-success">
+                <span aria-hidden="true">&#x2713;</span>
+            </button>
+            <button class="delete btn btn-danger">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </li>
+    {% endif %}
+    {% endfor %}
+</ul> -->
+
+
 <br>
 
 <form method="post">
         <div class="container d-flex">
             <input autocomplete="off" autofocus class="form-control task-input" name="task" placeholder="Task" size="20" type="text">
-            <button type="submit" class="btn btn-primary" type="submit">Add</button>
+            <div class="add-task">
+                <button type="submit" class="btn btn-primary" type="submit">Add</button>
+            </div>
 
         </div>
 </form>
 
 <br>
 <h3>Completed</h3>
-<ul id="completed-tasks">
+<ul id="completed-tasks" class="list-group">
     {% for task in user.tasks %}
     {% if task.status == "complete" %}
-        <li data-task_id="{{ task.id }}">{{ task.task }}
-            <div class="buttons">
-                <button class="delete">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        </li>
-        
+    <li class="list-group-item d-flex justify-content-between align-items-center" data-task_id="{{ task.id }}">
+        {{ task.task }}
+        <div class="buttons">
+            <button class="delete btn btn-danger">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </li>
     {% endif %}
     {% endfor %}
 </ul>
