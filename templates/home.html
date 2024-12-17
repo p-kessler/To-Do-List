@@ -4,48 +4,31 @@
 {% block title%}Home{% endblock %}
 
 {% block body %}
-<h1>Your To-Dos</h1>
-<br>
 
+
+<div class="home">
+<h2 class="headers home">Your To-Dos:</h2>
 <ul class="list-group">
-    {% for task in user.tasks %}
-    {% if task.status == "incomplete" %}
-    <li class="list-group-item d-flex justify-content-between align-items-center" data-task_id="{{ task.id }}">
-        {{ task.task }}
-        <div class="buttons">
-            <button class="complete btn btn-success">
-                <span aria-hidden="true">&#x2713;</span>
-            </button>
-            <button class="delete btn btn-danger">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    </li>
+    {% if not user.tasks %}
+        <p class="get-started">Add a task to get started!</p>
+    {% else %}
+        {% for task in user.tasks %}
+            {% if task.status == "incomplete" %}
+                <li class="list-group-item" style="display: flex; justify-content: space-between; align-items: center;"  data-task_id="{{ task.id }}">
+                    <span class="text">{{ task.task }}</span>
+                    <div class="buttons">
+                        <button class="complete btn btn-success">
+                            <span aria-hidden="true">&#x2713;</span>
+                        </button>
+                        <button class="delete btn btn-danger">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </li>
+            {% endif %}
+        {% endfor %}
     {% endif %}
-    {% endfor %}
 </ul>
-
-
-
-
-<!-- <ul class="list-group">
-    {% for task in user.tasks %}
-    {% if task.status == "incomplete" %}
-    <li class="list-group-item d-flex justify-content-between align-items-center" data-task_id="{{ task.id }}">
-        {{ task.task }}
-        <div class="buttons">
-            <button class="complete btn btn-success">
-                <span aria-hidden="true">&#x2713;</span>
-            </button>
-            <button class="delete btn btn-danger">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    </li>
-    {% endif %}
-    {% endfor %}
-</ul> -->
-
 
 <br>
 
@@ -60,12 +43,14 @@
 </form>
 
 <br>
-<h3>Completed</h3>
+<div class="headers">
+<h2>Completed:</h2>
+</div>
 <ul id="completed-tasks" class="list-group">
     {% for task in user.tasks %}
     {% if task.status == "complete" %}
     <li class="list-group-item d-flex justify-content-between align-items-center" data-task_id="{{ task.id }}">
-        {{ task.task }}
+        <span class="text">{{ task.task }}</span>
         <div class="buttons">
             <button class="delete btn btn-danger">
                 <span aria-hidden="true">&times;</span>
@@ -75,13 +60,14 @@
     {% endif %}
     {% endfor %}
 </ul>
+</div>
+
 
 <script> 
     document.querySelectorAll('.delete').forEach(button => {
         button.addEventListener('click', function() {
-            console.log(this.parentElement.parentElement);
             const taskId = this.parentElement.parentElement.getAttribute('data-task_id');
-            console.log("Task ID:", taskId);
+
             fetch('/delete-task', {
                 method: 'DELETE',
                 body: JSON.stringify({ id: taskId }),
@@ -96,6 +82,24 @@
             });
         });
     });
+    document.querySelectorAll('.delete').forEach(button => {
+    button.addEventListener('click', function() {
+        const taskId = this.parentElement.parentElement.getAttribute('data-task_id');
+
+        fetch('/delete-task', {
+            method: 'DELETE',
+            body: JSON.stringify({ id: taskId }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.success) {
+                this.parentElement.parentElement.remove();
+            }
+        });
+    });
+});
 </script>
 
 <script>
@@ -127,36 +131,3 @@
 
 
 
-
-<!-- <div class="container d-flex">
-    <li class="list-group-item tasks">{{ task.task }}
-        <button class="mark-complete">
-            <span aria-hidden="true">&#x2713;</span>
-        </button>
-        <button class="delete-button" onclick="deleteTask({{ task.id }})">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </li> -->
-
-
-
-
-<!-- 
-    <ul class="list-group list-group-flush">
-        {% for task in user.tasks %}
-        {% if task.status == "incomplete" %} -->
-    
-        <!-- Fix this issues vs keeping button outside of <li> -->
-        <!-- <div class="container d-flex">
-            <li class="list-group-item task" data-task_id="{{ task.id }}">{{ task.task }}
-                <button class="complete">
-                    <span aria-hidden="true">&#x2713;</span>
-                </button>
-                <button class="delete">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </li>
-        </div>
-        {% endif %}
-        {% endfor %}
-    </ul> -->

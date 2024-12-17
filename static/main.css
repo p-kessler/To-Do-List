@@ -1,7 +1,70 @@
 .task-input {
-    max-width: 300px;
+    max-width: 450px;
 }
 
 .add-task {
     padding-left: 10px;;
+}
+
+body {
+    background-color: #ebf2fa;
+}
+
+h2 {
+    text-align: center;
+}
+
+.home {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.get-started {
+    text-align: center;
+    padding-top: 15px;
+}
+
+li .text {
+    overflow-wrap: break-word;
+    flex: 1;
+    width: 0;
+    padding-right: 10px;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.headers {
+    margin-bottom: 30px;
+}
+
+.headers.home {
+    margin-top: 15px;;
+}
+
+/* li.list-group-item {
+    background-color: #a4c3b2;
+} */
+
+
+.btn-primary {
+    background-color: #064789;
+}
+
+.landing {
+    width: 500px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.info {
+    margin-bottom: 50px;
+}
+
+.account {
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 20px;;
 }

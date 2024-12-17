@@ -3,7 +3,12 @@
 {% block title%}Account{% endblock %}
 
 {% block body %}
-Your account page
 
-You are currently logged in as {{ user.first_name }}
+<div class="account">
+<h5>You are currently logged in as: {{ user.first_name }}</h5>
+<p>Not you?</p>
+<p>Button for logout</p>
+<p>Change Password</p>
+<p>Delete Account</p>
+</div>
 {% endblock %}
