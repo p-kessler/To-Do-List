@@ -4,11 +4,18 @@
 
 {% block body %}
 
-<div class="account">
-<h5>You are currently logged in as: {{ user.first_name }}</h5>
-<p>Not you?</p>
-<p>Button for logout</p>
-<p>Change Password</p>
-<p>Delete Account</p>
+<div>
+<h3>You are currently logged in as: {{ user.first_name }}</h3>
+<div class="change-password">
+<h6>Would you like to change your password?</h6>
+<a class="btn btn-secondary" href="/change-password" role="button">Change Password</a>
+</div>
+
+
+<div class="delete-account">
+<h6>Would you like to delete your account?</h6>
+<p>(Note: This action is permanent and you will lose all saved tasks)</p>
+<a class="btn btn-danger" href="/delete-account" role="button">Delete Account</a>
+</div>
 </div>
 {% endblock %}

@@ -167,6 +167,8 @@ def home():
     
     return render_template("home.html")
 
+
+# Add features to delete account and change password
 @app.route("/account", methods=["GET", "POST"])
 def account():
     return render_template("account.html")
