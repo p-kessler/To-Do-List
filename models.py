@@ -16,4 +16,4 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     first_name = db.Column(db.String(150), nullable=False)
-    tasks = db.relationship("Tasks")
+    tasks = db.relationship("Tasks", backref="user", cascade="all, delete-orphan")

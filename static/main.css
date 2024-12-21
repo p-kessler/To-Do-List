@@ -58,7 +58,7 @@ li .text {
 }
 
 .info {
-    margin-bottom: 50px;
+    margin-bottom: 35px;
 }
 
 
@@ -72,6 +72,7 @@ img {
 .landing-buttons {
     display: inline-block;
     margin-right: 50px;
+    margin-top: 10px;
 }
 
 .account {
@@ -86,6 +87,15 @@ img {
     margin-bottom: 30px;
 }
 
+h6, .change-password {
+    margin-bottom: 20px;;
+}
+
 p, change-password {
     margin-top: -5px;
+
+}
+
+.warning {
+    margin-top: 10px;
 }

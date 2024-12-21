@@ -134,8 +134,10 @@ def login():
                     return redirect(url_for("home"))
                 else:
                     flash("Incorrect password", category="error")
+                    return render_template("login.html", email=email)
             else:
                 flash("No account with this email address", category="error")
+                return render_template("login.html", email=email)
         return render_template("login.html", user=current_user)
 
 
@@ -170,6 +172,7 @@ def home():
 
 # Add features to delete account and change password
 @app.route("/account", methods=["GET", "POST"])
+@login_required
 def account():
     return render_template("account.html")
 
@@ -201,6 +204,83 @@ def mark_complete():
     
     return jsonify({'success': True})
 
+@app.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+
+        # Assign variables with data submitted
+        email = request.form.get("email")
+        current_password = request.form.get("current_password")
+        new_password = request.form.get("new_password")
+        confirmation = request.form.get("confirmation")
+        # Check for empty fields
+        if not all([email, current_password, new_password, confirmation]):
+            flash("Please complete all fields.", category="error")
+            return render_template("change-password.html", email=email)
+        
+        # Check if new password match
+        if not new_password == confirmation:
+            flash("New password do not match.", category="error")
+            return render_template("change-password.html", email=email)
+        
+        user = Users.query.filter_by(email=email).first()
+
+        if user:
+            if check_password_hash(user.password, current_password):
+                user.password = generate_password_hash(new_password)
+                db.session.commit()
+                flash("Password changed successfully", category="success")
+                return redirect(url_for("account"))
+            else:
+                flash("Incorrect password", category="error")
+                render_template("change-password.html", email=email)
+        else:
+                flash("No account with this email address", category="error")
+                render_template("change-password.html", email=email)
+
+
+    return render_template("change-password.html")
+
+@app.route("/delete-account", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    if request.method == "POST":
+
+        # Assign variables with data submitted
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirmation = request.form.get("confirmation")
+
+        # Check for empty fields
+        if not all([email, password, confirmation]):
+            flash("Please complete all fields.", category="error")
+            return render_template("delete-account.html", email=email)
+        
+        # Check if new password match
+        if not password == confirmation:
+            flash("Passwords do not match.", category="error")
+            return render_template("delete-account.html", email=email)
+        
+        user = Users.query.filter_by(email=email).first()
+
+        if user:
+            if check_password_hash(user.password, password):
+                # Delete users account and redirect to landing page
+                db.session.delete(user)
+                db.session.commit()
+                logout_user()
+                flash("Account successfully deleted.", category="success")
+                return redirect(url_for("index"))
+            else:
+                flash("Incorrect password", category="error")
+                render_template("delete-account.html", email=email)
+        else:
+                flash("No account with this email address", category="error")
+                render_template("delete-account.html", email=email)
+
+    return render_template("delete-account.html")
+
 
 if __name__ == "__main__":
     # Create database
@@ -209,17 +289,3 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 
-
-
-
-
-
-    # task = json.loads(request.data)
-    # task_id = task["task_id"]
-    # task = Tasks.query.get(task_id)
-
-    # if task:
-    #     if task.user_id == current_user.id:
-    #         db.session.delete(task)
-    #         db.session.commit()
-    #         return  jsonify({})

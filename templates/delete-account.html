@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+    <div class="py-5 text-center">
+        <h1>Delete My Account</h1>
+        <form action="/delete-account" method="post">
+            <div class="mb-3">
+                <input autofocus class="form-control mx-auto w-auto" name="email" placeholder="Email" type="email" value="{{ email }}">
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password">
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" name="confirmation" placeholder="Confirm Password" type="password">
+            </div>
+            <button class="btn btn-danger" type="submit">Delete My Account</button>
+            <p class="warning">*Note: This action cannot be undone. You will lose all data for this account.</p>
+        </form>
+    </div>
+{% endblock %}
