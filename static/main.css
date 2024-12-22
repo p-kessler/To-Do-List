@@ -31,10 +31,6 @@ li .text {
     padding-right: 10px;
 }
 
-.buttons {
-    display: flex;
-    gap: 10px;
-}
 
 .headers {
     margin-bottom: 30px;
@@ -58,21 +54,22 @@ li .text {
 }
 
 .info {
-    margin-bottom: 35px;
+    margin-bottom: 20px;
 }
 
 
 img {
     margin-top: 0;
     margin-bottom: 30px;
-    height: 250px;
-    width: 250px;
+    height: 200px;
+    width: 200px;
 }
 
 .landing-buttons {
     display: inline-block;
     margin-right: 50px;
     margin-top: 10px;
+    margin-left: 30px;
 }
 
 .account {
@@ -99,3 +96,4 @@ p, change-password {
 .warning {
     margin-top: 10px;
 }
+

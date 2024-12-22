@@ -170,7 +170,6 @@ def home():
     return render_template("home.html")
 
 
-# Add features to delete account and change password
 @app.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
@@ -187,8 +186,14 @@ def delete_task():
     task_id = data['id']
     task = Tasks.query.get(task_id)
     if task:
-        db.session.delete(task)
-        db.session.commit()
+        try:
+            db.session.delete(task)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash(f"Error deleting task: {str(e)}", category="error")
+            return render_template("home.html")            
+
 
     return jsonify({'success': True})
 
@@ -199,8 +204,13 @@ def mark_complete():
     task = Tasks.query.get(task_id)
 
     if task:
-        task.status = "complete"
-        db.session.commit()
+        try:
+            task.status = "complete"
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash(f"Error marking task complete: {str(e)}", category="error")
+            return render_template("home.html")      
     
     return jsonify({'success': True})
 
@@ -226,12 +236,17 @@ def change_password():
         
         user = Users.query.filter_by(email=email).first()
 
-        if user:
+        if user and user.email == email:
             if check_password_hash(user.password, current_password):
-                user.password = generate_password_hash(new_password)
-                db.session.commit()
-                flash("Password changed successfully", category="success")
-                return redirect(url_for("account"))
+                try:
+                    user.password = generate_password_hash(new_password)
+                    db.session.commit()
+                    flash("Password changed successfully", category="success")
+                    return redirect(url_for("account"))
+                except SQLAlchemyError as e:
+                    db.session.rollback()
+                    flash(f"Error changing password: {str(e)}", category="error")
+                    return render_template("change-password.html", email=email)   
             else:
                 flash("Incorrect password", category="error")
                 render_template("change-password.html", email=email)
@@ -267,11 +282,16 @@ def delete_account():
         if user:
             if check_password_hash(user.password, password):
                 # Delete users account and redirect to landing page
-                db.session.delete(user)
-                db.session.commit()
-                logout_user()
-                flash("Account successfully deleted.", category="success")
-                return redirect(url_for("index"))
+                try:
+                    db.session.delete(user)
+                    db.session.commit()
+                    logout_user()
+                    flash("Account successfully deleted.", category="success")
+                    return redirect(url_for("index"))
+                except SQLAlchemyError as e:
+                    db.session.rollback()
+                    flash(f"Error deleting account: {str(e)}", category="error")
+                    return render_template("delete-account.html", email=email) 
             else:
                 flash("Incorrect password", category="error")
                 render_template("delete-account.html", email=email)
