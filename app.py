@@ -1,15 +1,15 @@
-from flask_login import LoginManager, login_required
 from flask_sqlalchemy import SQLAlchemy
-from os import path
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
 from models import db, Users, Tasks
-import secrets
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = secrets.token_hex(16)
+load_dotenv()
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 # Configure database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -23,22 +23,6 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(id):
     return db.session.get(Users, int(id))
-
-
-
-
-
-# Landing page
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-# Log user out
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for("login"))
 
 
 
@@ -101,8 +85,7 @@ def register():
 
 
 
-        return render_template("register.html", user=current_user)
-
+    return render_template("register.html")
 
 # Logging in
 @app.route("/login", methods=["GET", "POST"])
@@ -138,8 +121,19 @@ def login():
                 flash("There is no account with this email address.", category="error")
                 return render_template("login.html", email=email)
             
-        return render_template("login.html", user=current_user)
+    return render_template("login.html")
 
+# Log user out
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+# Landing page
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 # Home page
 @app.route("/home", methods=["GET", "POST"])
@@ -173,47 +167,6 @@ def home():
 @login_required
 def account():
     return render_template("account.html")
-
-# Makes user accessible in all templates
-@app.context_processor
-def inject_user():
-    return dict(user=current_user)
-
-# Delete Task
-@app.route("/delete-task", methods=["DELETE"])
-def delete_task():
-    data = request.get_json()
-    task_id = data['id']
-    task = Tasks.query.get(task_id)
-    if task:
-        try:
-            db.session.delete(task)
-            db.session.commit()
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            flash(f"Error deleting task: {str(e)}", category="error")
-            return render_template("home.html")            
-
-
-    return jsonify({'success': True})
-
-# Marks task complete
-@app.route("/mark-complete", methods=["PUT"])
-def mark_complete():
-    data = request.get_json()
-    task_id = data['id']
-    task = Tasks.query.get(task_id)
-
-    if task:
-        try:
-            task.status = "complete"
-            db.session.commit()
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            flash(f"Error marking task complete: {str(e)}", category="error")
-            return render_template("home.html")      
-    
-    return jsonify({'success': True})
 
 # Change password
 @app.route("/change-password", methods=["GET", "POST"])
@@ -305,11 +258,52 @@ def delete_account():
 
     return render_template("delete-account.html")
 
+# Delete Task
+@app.route("/delete-task", methods=["DELETE"])
+def delete_task():
+    data = request.get_json()
+    task_id = data['id']
+    task = Tasks.query.get(task_id)
+    if task:
+        try:
+            db.session.delete(task)
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash(f"Error deleting task: {str(e)}", category="error")
+            return render_template("home.html")            
+
+
+    return jsonify({'success': True})
+
+# Marks task complete
+@app.route("/mark-complete", methods=["PUT"])
+def mark_complete():
+    data = request.get_json()
+    task_id = data['id']
+    task = Tasks.query.get(task_id)
+
+    if task:
+        try:
+            task.status = "complete"
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash(f"Error marking task complete: {str(e)}", category="error")
+            return render_template("home.html")      
+    
+    return jsonify({'success': True})
+
+# Makes user accessible in all templates
+@app.context_processor
+def inject_user():
+    return dict(user=current_user)
+
 
 if __name__ == "__main__":
     # Create database
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run()
 
 
