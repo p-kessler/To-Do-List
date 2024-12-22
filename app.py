@@ -5,10 +5,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask import Flask, flash, redirect, render_template, request, session, url_for, jsonify
 from models import db, Users, Tasks
 import secrets
-import re
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
-import json
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = secrets.token_hex(16)
@@ -30,10 +28,12 @@ def load_user(id):
 
 
 
+# Landing page
 @app.route("/")
 def index():
     return render_template("index.html")
 
+# Log user out
 @app.route("/logout")
 @login_required
 def logout():
@@ -42,7 +42,7 @@ def logout():
 
 
 
-# Route for registering an account
+# Registering for an account
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if current_user.is_authenticated:
@@ -51,8 +51,10 @@ def register():
 
         if request.method == "POST":
             # Assign variables with data submitted
-            email = request.form.get("email")
-            first_name = request.form.get("first_name")
+
+            # Convert email to lowercase to avoid case sensitivity
+            email = request.form.get("email").lower()
+            first_name = request.form.get("first_name").capitalize()
             password = request.form.get("password")
             confirmation = request.form.get("confirmation")
 
@@ -77,25 +79,19 @@ def register():
                 flash("Password must be at least 7 characters.", category="error")
                 return render_template("register.html", email=email, first_name=first_name)
 
-            # Validate email format
-            if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                flash("Please enter a valid email address.", category="error")
-                return render_template("register.html", email=email, first_name=first_name)
             else:
-
                 #try adding user to db
                 try:
                     # Hash entered password
                     hashed_password = generate_password_hash(password)
 
-                    # Create new user 
+                    # Create new user and log them in
                     new_user = Users(email=email, first_name=first_name, password=hashed_password)
                     db.session.add(new_user)
                     db.session.commit()
                     login_user(new_user, remember=True)
                     flash("Account created successfully!", category="success")
                     # return redirect
-
                     return redirect(url_for("home"))
 
                 except SQLAlchemyError as e:
@@ -108,16 +104,18 @@ def register():
         return render_template("register.html", user=current_user)
 
 
-# Route for logging in to account
+# Logging in
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
+    # if user is already logged in it redirects them to their home page
     if current_user.is_authenticated:
         return redirect(url_for("home"))
     else:
 
         # Forget any user_id
         session.clear()
+
         if request.method == "POST":
             email = request.form.get("email")
             password = request.form.get("password")
@@ -128,22 +126,22 @@ def login():
 
             user = Users.query.filter_by(email=email).first()
 
+            # If user exists then log them in
             if user:
                 if check_password_hash(user.password, password):
                     login_user(user, remember=True)
                     return redirect(url_for("home"))
                 else:
-                    flash("Incorrect password", category="error")
+                    flash("Incorrect password.", category="error")
                     return render_template("login.html", email=email)
             else:
-                flash("No account with this email address", category="error")
+                flash("There is no account with this email address.", category="error")
                 return render_template("login.html", email=email)
+            
         return render_template("login.html", user=current_user)
 
 
-
-
-# Route for home page
+# Home page
 @app.route("/home", methods=["GET", "POST"])
 @login_required
 def home():
@@ -152,6 +150,7 @@ def home():
         
         if len(task) < 1:
             flash("Task is too short!", category="error")
+            return render_template("home.html")
         else:
             try:
                 new_task = Tasks(task=task, user_id=current_user.id)
@@ -169,7 +168,7 @@ def home():
     
     return render_template("home.html")
 
-
+# Account page
 @app.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
@@ -180,6 +179,7 @@ def account():
 def inject_user():
     return dict(user=current_user)
 
+# Delete Task
 @app.route("/delete-task", methods=["DELETE"])
 def delete_task():
     data = request.get_json()
@@ -197,6 +197,7 @@ def delete_task():
 
     return jsonify({'success': True})
 
+# Marks task complete
 @app.route("/mark-complete", methods=["PUT"])
 def mark_complete():
     data = request.get_json()
@@ -214,6 +215,7 @@ def mark_complete():
     
     return jsonify({'success': True})
 
+# Change password
 @app.route("/change-password", methods=["GET", "POST"])
 @login_required
 def change_password():
@@ -236,6 +238,7 @@ def change_password():
         
         user = Users.query.filter_by(email=email).first()
 
+        # Change users password
         if user and user.email == email:
             if check_password_hash(user.password, current_password):
                 try:
@@ -257,6 +260,7 @@ def change_password():
 
     return render_template("change-password.html")
 
+# Delete account
 @app.route("/delete-account", methods=["GET", "POST"])
 @login_required
 def delete_account():

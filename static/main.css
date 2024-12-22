@@ -97,3 +97,6 @@ p, change-password {
     margin-top: 10px;
 }
 
+.flashed-messages {
+    text-align: center;
+}

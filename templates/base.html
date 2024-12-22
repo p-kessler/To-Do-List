@@ -9,7 +9,6 @@
 </head>
 <body>
 
-    <!-- Create navbar -->
     <nav class="bg-light border navbar navbar-expand-md navbar-light">
         <div class="container-fluid">
             {% if user.is_authenticated %}
@@ -44,12 +43,12 @@
     {% if messages %}
         {% for category, message in messages %}
         {% if category == "error" %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show flashed-messages" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>     
         </div>
         {% else %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show flashed-messages" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
             </button>     
@@ -67,12 +66,9 @@
         </div>
     </main>
 
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
 
-    <!-- <script
-        type="text/javascript"
-        src="{{ url_for('static', filename='main.js') }}">
-    </script> -->
