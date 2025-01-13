@@ -37,8 +37,8 @@ def register():
             # Assign variables with data submitted
 
             # Convert email to lowercase to avoid case sensitivity
-            email = request.form.get("email").lower()
-            first_name = request.form.get("first_name").capitalize()
+            email = request.form.get("email").strip().lower()
+            first_name = request.form.get("first_name").strip().capitalize()
             password = request.form.get("password")
             confirmation = request.form.get("confirmation")
 
@@ -100,7 +100,7 @@ def login():
         session.clear()
 
         if request.method == "POST":
-            email = request.form.get("email")
+            email = request.form.get("email").strip()
             password = request.form.get("password")
 
             if not email or not password:
@@ -175,7 +175,7 @@ def change_password():
     if request.method == "POST":
 
         # Assign variables with data submitted
-        email = request.form.get("email")
+        email = request.form.get("email").strip()
         current_password = request.form.get("current_password")
         new_password = request.form.get("new_password")
         confirmation = request.form.get("confirmation")
@@ -220,7 +220,7 @@ def delete_account():
     if request.method == "POST":
 
         # Assign variables with data submitted
-        email = request.form.get("email")
+        email = request.form.get("email").strip()
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
 
